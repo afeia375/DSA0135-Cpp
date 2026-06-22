@@ -1,0 +1,106 @@
+//1) Rotate Array by k positions (Right Rotation)
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n, k;
+    cin >> n;
+
+    int arr[100];
+
+    for(int i = 0; i < n; i++)
+        cin >> arr[i];
+
+    cin >> k;
+
+    k = k % n;
+
+    for(int i = n - k; i < n; i++)
+        cout << arr[i] << " ";
+
+    for(int i = 0; i < n - k; i++)
+        cout << arr[i] << " ";
+
+    return 0;
+}
+
+//2) Sum of Diagonal
+#include <iostream>
+using namespace std;
+
+int main() {
+    int a[3][3], sum = 0;
+
+    for(int i = 0; i < 3; i++)
+        for(int j = 0; j < 3; j++)
+            cin >> a[i][j];
+
+    for(int i = 0; i < 3; i++)
+        sum += a[i][i];
+
+    cout << sum;
+
+    return 0;
+}
+
+//3) Longest Common Subsequence (LCS)
+#include <iostream>
+#include <cstring>
+using namespace std;
+
+int main() {
+    char s1[100], s2[100];
+    cin >> s1 >> s2;
+
+    int n = strlen(s1);
+    int m = strlen(s2);
+
+    int dp[100][100];
+
+    for(int i = 0; i <= n; i++) {
+        for(int j = 0; j <= m; j++) {
+            if(i == 0 || j == 0)
+                dp[i][j] = 0;
+            else if(s1[i-1] == s2[j-1])
+                dp[i][j] = dp[i-1][j-1] + 1;
+            else
+                dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
+        }
+    }
+
+    cout << "Length: " << dp[n][m];
+
+    return 0;
+}
+
+//4) Largest and Smallest Digit in a Number
+#include <iostream>
+using namespace std;
+
+void findDigits(int n) {
+    int largest = 0, smallest = 9;
+
+    while(n > 0) {
+        int d = n % 10;
+
+        if(d > largest)
+            largest = d;
+
+        if(d < smallest)
+            smallest = d;
+
+        n /= 10;
+    }
+
+    cout << "Largest: " << largest << endl;
+    cout << "Smallest: " << smallest;
+}
+
+int main() {
+    int n;
+    cin >> n;
+
+    findDigits(n);
+
+    return 0;
+}

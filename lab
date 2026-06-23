@@ -540,3 +540,145 @@ int main(){
     cout<<d;
 }
 ----------------------------------------------------
+//matrix addition and multiplication
+#include <iostream>
+using namespace std;
+
+int main(){
+    int a[2][2],b[2][2];
+
+    for(int i=0;i<2;i++)
+        for(int j=0;j<2;j++)
+            cin>>a[i][j];
+
+    for(int i=0;i<2;i++)
+        for(int j=0;j<2;j++)
+            cin>>b[i][j];
+
+    // Addition
+    for(int i=0;i<2;i++){
+        for(int j=0;j<2;j++)
+            cout<<a[i][j]+b[i][j]<<" ";
+        cout<<endl;
+    }
+
+    // Multiplication
+    for(int i=0;i<2;i++){
+        for(int j=0;j<2;j++){
+            int sum=0;
+            for(int k=0;k<2;k++)
+                sum+=a[i][k]*b[k][j];
+            cout<<sum<<" ";
+        }
+        cout<<endl;
+    }
+}
+---------------------------------------------------------------
+//armstrong number
+#include <iostream>
+using namespace std;
+
+int main(){
+    int n,temp,sum=0;
+    cin>>n;
+    temp=n;
+
+    while(n>0){
+        int d=n%10;
+        sum+=d*d*d;
+        n/=10;
+    }
+
+    if(sum==temp) cout<<"Armstrong";
+    else cout<<"Not Armstrong";
+}
+----------------------------------------------------------------------
+//String Tokenizer
+#include <iostream>
+#include <cstring>
+using namespace std;
+
+int main(){
+    char str[100];
+    cin.getline(str,100);
+
+    char *t=strtok(str," ");
+
+    while(t!=NULL){
+        cout<<t<<endl;
+        t=strtok(NULL," ");
+    }
+}
+--------------------------------------------------------------------------
+//Simple Interest
+#include <iostream>
+using namespace std;
+
+int main(){
+    float p,r,t;
+    cin>>p>>r>>t;
+    cout<<(p*r*t)/100;
+}
+---------------------------------------------------------------------
+//Volume & Surface Area
+#include <iostream>
+using namespace std;
+
+int main(){
+    float a,r,h;
+    
+    cin>>a;
+    cout<<a*a*a<<" "<<6*a*a<<endl;
+
+    cin>>r;
+    cout<<(4.0/3)*3.14*r*r*r<<" "<<4*3.14*r*r<<endl;
+
+    cin>>r>>h;
+    cout<<3.14*r*r*h<<" "<<2*3.14*r*(r+h);
+}
+-------------------------------------------------------------
+//student class
+#include <iostream>
+using namespace std;
+
+class Student {
+public:
+    int roll, marks;
+
+    void input() {
+        cin >> roll >> marks;
+    }
+
+    void display() {
+        cout << roll << " " << marks;
+    }
+};
+
+int main() {
+    Student s;
+    s.input();
+    s.display();
+}
+---------------------------------------------------------------
+//Student Average Marks
+#include <iostream>
+using namespace std;
+
+class Student {
+public:
+    int m1, m2, m3;
+
+    void input() {
+        cin >> m1 >> m2 >> m3;
+    }
+
+    void avg() {
+        cout << (m1 + m2 + m3) / 3;
+    }
+};
+
+int main() {
+    Student s;
+    s.input();
+    s.avg();
+}

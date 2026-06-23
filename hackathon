@@ -1,0 +1,276 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <ctime>
+using namespace std;
+
+// ============================================================
+// 🌊 OCEANGUARD - Ocean Hazard Reporting System 🌊
+// ============================================================
+
+// ─────────────────────────────────────────
+// STRUCTS
+// ─────────────────────────────────────────
+struct Report {
+    int id;
+    string name, location, hazardType, description;
+    string severity, timestamp;
+    bool keywordDetected;
+    int riskScore;
+};
+
+struct Hotspot {
+    string location;
+    int count;
+    string risk;
+};
+
+// ─────────────────────────────────────────
+// UTIL FUNCTIONS
+// ─────────────────────────────────────────
+string toLower(string s) {
+    transform(s.begin(), s.end(), s.begin(), ::tolower);
+    return s;
+}
+
+string getTime() {
+    time_t now = time(0);
+    string t = ctime(&now);
+    t.pop_back();
+    return t;
+}
+
+// ─────────────────────────────────────────
+// INPUT SYSTEM (WITH VALIDATION)
+// ─────────────────────────────────────────
+vector<Report> inputReports() {
+    cout << "\n📥 REPORT INPUT SYSTEM\n";
+
+    int n;
+    while (true) {
+        cout << "Enter number of reports: ";
+        cin >> n;
+
+        if (cin.fail() || n <= 0 || n > 100) {
+            cout << "❌ Invalid input! Enter 1–100.\n";
+            cin.clear();
+            cin.ignore(1000, '\n');
+        } else {
+            cin.ignore();
+            break;
+        }
+    }
+
+    vector<Report> reports;
+
+    for (int i = 0; i < n; i++) {
+        Report r;
+        r.id = i + 1;
+        r.timestamp = getTime();
+
+        cout << "\n📝 Report " << i + 1 << "\n";
+
+        do {
+            cout << "👤 Name: ";
+            getline(cin, r.name);
+        } while (r.name.empty());
+
+        do {
+            cout << "📍 Location: ";
+            getline(cin, r.location);
+        } while (r.location.empty());
+
+        int choice;
+        while (true) {
+            cout << "🌊 Hazard (1-Tsunami 2-Flood 3-Waves): ";
+            cin >> choice;
+
+            if (cin.fail() || choice < 1 || choice > 3) {
+                cout << "❌ Invalid choice!\n";
+                cin.clear();
+                cin.ignore(1000, '\n');
+            } else {
+                cin.ignore();
+                break;
+            }
+        }
+
+        if (choice == 1) r.hazardType = "Tsunami";
+        else if (choice == 2) r.hazardType = "Flood";
+        else r.hazardType = "Waves";
+
+        int sev;
+        while (true) {
+            cout << "⚠ Severity (1-Low 2-Medium 3-High): ";
+            cin >> sev;
+
+            if (cin.fail() || sev < 1 || sev > 3) {
+                cout << "❌ Invalid severity!\n";
+                cin.clear();
+                cin.ignore(1000, '\n');
+            } else {
+                cin.ignore();
+                break;
+            }
+        }
+
+        if (sev == 1) r.severity = "Low";
+        else if (sev == 2) r.severity = "Medium";
+        else r.severity = "High";
+
+        do {
+            cout << "🧾 Description: ";
+            getline(cin, r.description);
+        } while (r.description.empty());
+
+        r.keywordDetected = false;
+        r.riskScore = 0;
+
+        reports.push_back(r);
+
+        cout << "✅ Report submitted!\n";
+    }
+
+    return reports;
+}
+
+// ─────────────────────────────────────────
+// KEYWORD ANALYSIS
+// ─────────────────────────────────────────
+bool detectKeyword(string text) {
+    text = toLower(text);
+    return (text.find("tsunami") != string::npos ||
+            text.find("flood") != string::npos ||
+            text.find("wave") != string::npos);
+}
+
+void keywordAnalysis(vector<Report>& r) {
+    cout << "\n🔍 KEYWORD ANALYSIS\n";
+
+    for (auto& x : r) {
+        x.keywordDetected = detectKeyword(x.description);
+
+        if (x.keywordDetected)
+            cout << "⚠ Keyword detected in Report "
+                 << x.id << " (" << x.location << ")\n";
+        else
+            cout << "✅ No keyword in Report "
+                 << x.id << "\n";
+    }
+}
+
+// ─────────────────────────────────────────
+// HOTSPOT DETECTION
+// ─────────────────────────────────────────
+vector<Hotspot> detectHotspots(vector<Report>& r) {
+    cout << "\n🔥 HOTSPOT DETECTION\n";
+
+    vector<Hotspot> h;
+    vector<bool> visited(r.size(), false);
+
+    for (int i = 0; i < r.size(); i++) {
+        if (visited[i]) continue;
+
+        int count = 1;
+        for (int j = i + 1; j < r.size(); j++) {
+            if (r[i].location == r[j].location) {
+                count++;
+                visited[j] = true;
+            }
+        }
+
+        if (count >= 2) {
+            Hotspot temp;
+            temp.location = r[i].location;
+            temp.count = count;
+
+            if (count >= 4) temp.risk = "HIGH";
+            else if (count == 3) temp.risk = "MEDIUM";
+            else temp.risk = "LOW";
+
+            h.push_back(temp);
+
+            cout << "🔥 HOTSPOT: " << temp.location
+                 << " (" << temp.count << " reports)\n";
+        }
+    }
+
+    if (h.empty()) cout << "✅ No hotspots found\n";
+    return h;
+}
+
+// ─────────────────────────────────────────
+// RISK ANALYSIS
+// ─────────────────────────────────────────
+int calcRisk(Report& r) {
+    int score = 0;
+
+    if (r.hazardType == "Tsunami") score += 80;
+    else if (r.hazardType == "Flood") score += 60;
+    else score += 40;
+
+    if (r.severity == "High") score += 20;
+    else if (r.severity == "Medium") score += 10;
+
+    if (r.keywordDetected) score += 10;
+
+    return min(score, 100);
+}
+
+void riskAnalysis(vector<Report>& r) {
+    cout << "\n📊 RISK ANALYSIS\n";
+
+    for (auto& x : r) {
+        x.riskScore = calcRisk(x);
+
+        cout << "📍 Report " << x.id
+             << " | Risk Score: "
+             << x.riskScore << "/100\n";
+    }
+}
+
+// ─────────────────────────────────────────
+// FILE STORAGE (WITH EXCEPTION)
+// ─────────────────────────────────────────
+void saveFile(vector<Report>& r) {
+    cout << "\n💾 SAVING DATA...\n";
+
+    try {
+        ofstream file("reports.txt");
+
+        if (!file) throw runtime_error("File error!");
+
+        for (auto& x : r) {
+            file << x.id << "," << x.location
+                 << "," << x.riskScore << endl;
+        }
+
+        file.close();
+        cout << "✅ File saved successfully!\n";
+
+    } catch (exception& e) {
+        cout << "❌ Error: " << e.what() << endl;
+    }
+}
+
+// ─────────────────────────────────────────
+// MAIN
+// ─────────────────────────────────────────
+int main() {
+    cout << "\n🌊🌊 OCEANGUARD SYSTEM 🌊🌊\n";
+
+    vector<Report> reports = inputReports();
+
+    keywordAnalysis(reports);
+
+    vector<Hotspot> hotspots = detectHotspots(reports);
+
+    riskAnalysis(reports);
+
+    saveFile(reports);
+
+    cout << "\n🎉 SYSTEM COMPLETED SUCCESSFULLY!\n";
+    return 0;
+}
